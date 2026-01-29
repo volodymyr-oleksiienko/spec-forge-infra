@@ -1,0 +1,78 @@
+name: "CI/CD (prod:spec-forge-infra)"
+
+on:
+  push:
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g. v0.1.0)'
+        required: true
+env:
+  TF_VAR_digital_ocean_token: ${{ secrets.DIGITAL_OCEAN_TOKEN }}
+  TF_VAR_server_ssh_public_key: ${{ secrets.SERVER_SSH_PUBLIC_KEY }}
+  TF_VAR_gh_secret_sync_token: ${{ secrets.GH_SECRET_SYNC_TOKEN }}
+  TF_VAR_tf_cloud_organization: VolodymyrOleksiienko
+  TF_VAR_tf_cloud_workspace: spec-forge-infra
+  TF_VAR_gh_target_repositories: '["spec-forge-api","spec-forge-front"]'
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./infra
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          cli_config_credentials_token: ${{ secrets.HCP_TERRAFORM_TOKEN }}
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Format Check
+        run: terraform fmt -check
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -input=false
+
+      - name: Update Pull Request
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        env:
+          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const plan = process.env.PLAN;
+            
+            const output = `#### Terraform Plan (\`${{ steps.plan.outcome }}\`)
+            
+            <details>
+            
+            <summary>Show Plan</summary>
+            
+            \`\`\`${plan}\`\`\`
+            
+            </details>`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+
+      - name: Terraform Apply
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        run: terraform apply -auto-approve -input=false

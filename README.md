@@ -32,8 +32,6 @@ terraform plan \
   -var="digital_ocean_token=$DIGITAL_OCEAN_TOKEN" \
   -var="server_ssh_public_key=$SERVER_SSH_PUBLIC_KEY" \
   -var="gh_secret_sync_token=$GH_SECRET_SYNC_TOKEN" \
-  -var="tf_cloud_organization=$TF_CLOUD_ORGANIZATION" \
-  -var="tf_cloud_workspace=$TF_CLOUD_WORKSPACE" \
   -var="gh_target_repositories=$GH_TARGET_REPOSITORIES"
 ```
 
@@ -54,8 +52,6 @@ terraform plan \
 * `HCP_TERRAFORM_TOKEN`: For remote state management
 * `SERVER_SSH_PUBLIC_KEY`: SSH key injected into the root user
 * `GH_SECRET_SYNC_TOKEN`: For syncing IP addresses to app repositories
-* `TF_CLOUD_ORGANIZATION`: Terraform Cloud organization name
-* `TF_CLOUD_WORKSPACE`: Terraform Cloud workspace name
 * `GH_TARGET_REPOSITORIES`: List of GitHub repositories that receive the SERVER_IP secret
 
 ---

@@ -14,8 +14,6 @@ env:
   TF_VAR_digital_ocean_token: ${{ secrets.DIGITAL_OCEAN_TOKEN }}
   TF_VAR_server_ssh_public_key: ${{ secrets.SERVER_SSH_PUBLIC_KEY }}
   TF_VAR_gh_secret_sync_token: ${{ secrets.GH_SECRET_SYNC_TOKEN }}
-  TF_VAR_tf_cloud_organization: VolodymyrOleksiienko
-  TF_VAR_tf_cloud_workspace: spec-forge-infra
   TF_VAR_gh_target_repositories: '["spec-forge-api","spec-forge-front"]'
 
 jobs:

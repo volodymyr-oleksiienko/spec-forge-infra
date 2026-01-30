@@ -1,13 +1,3 @@
-variable "tf_cloud_organization" {
-  description = "Terraform Cloud organization name"
-  type        = string
-}
-
-variable "tf_cloud_workspace" {
-  description = "Terraform Cloud workspace name"
-  type        = string
-}
-
 variable "gh_target_repositories" {
   description = "Repositories that receive SERVER_IP secret"
   type        = list(string)

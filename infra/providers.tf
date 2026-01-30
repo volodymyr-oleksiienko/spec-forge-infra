@@ -2,9 +2,9 @@ terraform {
   required_version = "~> 1.14"
 
   cloud {
-    organization = var.tf_cloud_organization
+    organization = "VolodymyrOleksiienko"
     workspaces {
-      name = var.tf_cloud_workspace
+      name = "spec-forge-infra"
     }
   }
 

@@ -1,0 +1,46 @@
+version: '3.8'
+services:
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy:1.9-alpine
+    restart: always
+    ports: ["80:80", "443:443"]
+    labels:
+      - "com.github.nginx-proxy.nginx=true"
+    volumes:
+      - /mnt/data/certs:/etc/nginx/certs:ro
+      - /mnt/data/vhost:/etc/nginx/vhost.d
+      - /mnt/data/html:/usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - shared_network
+    healthcheck:
+      test: [ "CMD-SHELL", "nginx -t && pidof nginx" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  acme-companion:
+    image: nginxproxy/acme-companion:2.6
+    restart: always
+    volumes:
+      - /mnt/data/certs:/etc/nginx/certs:rw
+      - /mnt/data/vhost:/etc/nginx/vhost.d
+      - /mnt/data/html:/usr/share/nginx/html
+      - /mnt/data/acme:/etc/acme.sh
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - DEFAULT_EMAIL=admin@${domain_name}
+    depends_on:
+      - nginx-proxy
+    networks:
+      - shared_network
+    healthcheck:
+      test: [ "CMD", "pgrep", "docker-gen" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+networks:
+  shared_network:
+    external: true

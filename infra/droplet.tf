@@ -3,7 +3,7 @@ data "local_file" "docker_compose" {
 }
 
 resource "digitalocean_ssh_key" "default" {
-  name = "github-actions-key"
+  name       = "github-actions-key"
   public_key = var.server_ssh_public_key
 }
 
@@ -19,12 +19,12 @@ resource "digitalocean_volume" "data" {
 }
 
 resource "digitalocean_droplet" "web" {
-  name = "spec-forge-server"
-  image = "ubuntu-24-04-x64"
-  region = "ams3"
-  size = "s-1vcpu-1gb"
+  name       = "spec-forge-server"
+  image      = "ubuntu-24-04-x64"
+  region     = "ams3"
+  size       = "s-1vcpu-1gb"
   volume_ids = [digitalocean_volume.data.id]
-  ssh_keys = [digitalocean_ssh_key.default.fingerprint]
+  ssh_keys   = [digitalocean_ssh_key.default.fingerprint]
   monitoring = true
 
   tags = [

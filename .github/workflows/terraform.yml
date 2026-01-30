@@ -6,10 +6,7 @@ on:
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version tag (e.g. v0.1.0)'
-        required: true
+
 env:
   TF_VAR_digital_ocean_token: ${{ secrets.DIGITAL_OCEAN_TOKEN }}
   TF_VAR_server_ssh_public_key: ${{ secrets.SERVER_SSH_PUBLIC_KEY }}
@@ -29,11 +26,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref }}
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd
         with:
           cli_config_credentials_token: ${{ secrets.HCP_TERRAFORM_TOKEN }}
 
